@@ -86,7 +86,7 @@ export default function HomePage() {
               <Suspense fallback={<LoadingSpinner />}>
                 <div className="space-y-6">
                   {mockSecrets
-                    .sort((a, b) => b.interactions - a.interactions)
+                    .sort((a, b) => (b.interactions || 0) - (a.interactions || 0))
                     .map((secret) => (
                       <SecretCard key={secret.id} secret={secret} />
                     ))}
