@@ -66,6 +66,7 @@ export function generateRandomUsername(): string {
 }
 
 export function getUsernameFromStorage(): string {
+  // Return "Anonymous" during server-side rendering
   if (typeof window === "undefined") return "Anonymous"
 
   let username = localStorage.getItem("anonymous-username")

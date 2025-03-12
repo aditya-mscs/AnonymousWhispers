@@ -6,7 +6,6 @@ import "./globals.css"
 export const metadata = {
   title: "Anonymous Dark Secrets",
   description: "Share your darkest secrets anonymously without judgment",
-    generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -16,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen bg-background text-foreground">
+      <body className="min-h-screen bg-background text-foreground antialiased" suppressHydrationWarning>
         <Providers>
           <Navbar />
           <main>{children}</main>
@@ -26,6 +25,3 @@ export default function RootLayout({
   )
 }
 
-
-
-import './globals.css'

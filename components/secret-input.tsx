@@ -1,9 +1,10 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useCallback } from "react"
 import { Mic, MicOff, Send } from "lucide-react"
 import { createSecret } from "@/lib/actions"
 import { getUsernameFromStorage } from "@/lib/username-generator"
+import { useToast } from "./ui/toast-context"
 
 // Define SpeechRecognition and SpeechRecognitionEvent types
 declare global {
@@ -62,19 +63,10 @@ export function SecretInput() {
   const [secret, setSecret] = useState("")
   const [isRecording, setIsRecording] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [toast, setToast] = useState<{
-    title: string
-    description: string
-    status: "success" | "error" | "info"
-  } | null>(null)
+  const { showToast } = useToast()
   const recognitionRef = useRef<SpeechRecognition | null>(null)
 
-  const showToast = (title: string, description: string, status: "success" | "error" | "info") => {
-    setToast({ title, description, status })
-    setTimeout(() => setToast(null), 5000)
-  }
-
-  const startRecording = () => {
+  const startRecording = useCallback(() => {
     if (!("webkitSpeechRecognition" in window) && !("SpeechRecognition" in window)) {
       showToast("Speech recognition not supported", "Your browser doesn't support speech recognition.", "error")
       return
@@ -114,9 +106,9 @@ export function SecretInput() {
       console.error("Error starting speech recognition:", error)
       showToast("Error starting recording", "Could not start speech recognition.", "error")
     }
-  }
+  }, [showToast])
 
-  const stopRecording = () => {
+  const stopRecording = useCallback(() => {
     if (recognitionRef.current) {
       recognitionRef.current.stop()
       recognitionRef.current = null
@@ -124,9 +116,9 @@ export function SecretInput() {
 
       showToast("Recording stopped", "Your speech has been converted to text.", "success")
     }
-  }
+  }, [showToast])
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (secret.length < 10) {
       showToast("Secret too short", "Your secret must be at least 10 characters long.", "error")
       return
@@ -158,23 +150,27 @@ export function SecretInput() {
     } finally {
       setIsSubmitting(false)
     }
-  }
+  }, [secret, showToast])
 
   return (
     <div className="bg-card border border-purple-700 rounded-lg shadow-md">
       <div className="p-4">
         <div className="space-y-4">
           <textarea
+            id="secret-input"
+            name="secret-input"
             placeholder="Share your secret... (min 10 characters)"
             className="w-full min-h-[120px] p-3 text-lg border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400 bg-background"
             value={secret}
             onChange={(e) => setSecret(e.target.value)}
+            aria-label="Secret input"
           />
 
           <div className="flex justify-between items-center">
             <div>
               {!isRecording ? (
                 <button
+                  type="button"
                   aria-label="Record your secret"
                   onClick={startRecording}
                   className="p-2 rounded-full border border-purple-500 text-purple-500 hover:bg-purple-100 dark:hover:bg-purple-900/30"
@@ -183,6 +179,7 @@ export function SecretInput() {
                 </button>
               ) : (
                 <button
+                  type="button"
                   aria-label="Stop recording"
                   onClick={stopRecording}
                   className="p-2 rounded-full border border-red-500 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 animate-pulse"
@@ -193,6 +190,7 @@ export function SecretInput() {
             </div>
 
             <button
+              type="submit"
               onClick={handleSubmit}
               disabled={secret.length < 10 || isSubmitting}
               className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -212,18 +210,6 @@ export function SecretInput() {
           </div>
         </div>
       </div>
-
-      {/* Toast notification */}
-      {toast && (
-        <div
-          className={`fixed bottom-4 right-4 max-w-md p-4 rounded-md shadow-lg ${
-            toast.status === "success" ? "bg-green-500" : toast.status === "error" ? "bg-red-500" : "bg-blue-500"
-          } text-white`}
-        >
-          <h3 className="font-bold">{toast.title}</h3>
-          <p>{toast.description}</p>
-        </div>
-      )}
     </div>
   )
 }

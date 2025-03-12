@@ -1,4 +1,3 @@
-// Import forwardRef from React
 import { forwardRef } from "react"
 
 // Export React's forwardRef for use in our components

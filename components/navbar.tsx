@@ -1,29 +1,43 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback, memo, useEffect } from "react"
 import Link from "next/link"
 import { Menu, X } from "lucide-react"
 import { ThemeToggle } from "./theme-toggle"
 import { getUsernameFromStorage, regenerateUsername } from "@/lib/username-generator"
 import { cn } from "@/lib/utils"
 
-export function Navbar() {
+export const Navbar = memo(function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
-  const [username, setUsername] = useState(() =>
-    typeof window !== "undefined" ? getUsernameFromStorage() : "Anonymous",
-  )
+  // Start with "Anonymous" for server-side rendering
+  const [username, setUsername] = useState("Anonymous")
 
-  const handleRegenerateUsername = () => {
+  // Update username after component mounts on client
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setUsername(getUsernameFromStorage())
+    }
+  }, [])
+
+  const handleRegenerateUsername = useCallback(() => {
     const newUsername = regenerateUsername()
     setUsername(newUsername)
-  }
+  }, [])
+
+  const toggleMenu = useCallback(() => {
+    setIsOpen((prev) => !prev)
+  }, [])
+
+  const closeMenu = useCallback(() => {
+    setIsOpen(false)
+  }, [])
 
   return (
     <div className="border-b border-border">
       <div className="flex h-16 items-center px-4">
         <div className="md:hidden mr-2">
           <button
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={toggleMenu}
             className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
             aria-label="Toggle navigation"
           >
@@ -69,21 +83,21 @@ export function Navbar() {
           <Link
             href="/"
             className="block px-3 py-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
-            onClick={() => setIsOpen(false)}
+            onClick={closeMenu}
           >
             Home
           </Link>
           <Link
             href="/trending"
             className="block px-3 py-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
-            onClick={() => setIsOpen(false)}
+            onClick={closeMenu}
           >
             Trending
           </Link>
           <Link
             href="/about"
             className="block px-3 py-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
-            onClick={() => setIsOpen(false)}
+            onClick={closeMenu}
           >
             About
           </Link>
@@ -102,5 +116,5 @@ export function Navbar() {
       </div>
     </div>
   )
-}
+})
 

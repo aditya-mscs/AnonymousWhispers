@@ -1,9 +1,19 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ChevronLeft } from "lucide-react"
-import { SecretCard } from "@/components/secret-card"
+import { Suspense, lazy } from "react"
 import { mockSecrets } from "@/lib/mock-data"
 import { AdBanner } from "@/components/ad-banner"
+
+// Lazy load components
+const SecretCard = lazy(() => import("@/components/secret-card").then((mod) => ({ default: mod.SecretCard })))
+
+// Loading fallback
+const LoadingSpinner = () => (
+  <div className="flex justify-center py-8">
+    <div className="h-8 w-8 border-4 border-t-purple-500 border-gray-200 rounded-full animate-spin"></div>
+  </div>
+)
 
 interface SecretPageProps {
   params: {
@@ -33,7 +43,9 @@ export default function SecretPage({ params }: SecretPageProps) {
 
         <AdBanner position="top" />
 
-        <SecretCard secret={secret} />
+        <Suspense fallback={<LoadingSpinner />}>
+          <SecretCard secret={secret} />
+        </Suspense>
 
         <div className="text-center text-sm text-gray-500 dark:text-gray-400 mt-8">
           <p>This secret was shared anonymously on Anonymous Dark Secrets.</p>

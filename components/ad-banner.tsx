@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback, memo } from "react"
 import { X } from "lucide-react"
 
 interface AdBannerProps {
@@ -8,8 +8,12 @@ interface AdBannerProps {
   format?: "banner" | "square" | "skyscraper"
 }
 
-export function AdBanner({ position, format = "banner" }: AdBannerProps) {
+export const AdBanner = memo(function AdBanner({ position, format = "banner" }: AdBannerProps) {
   const [isVisible, setIsVisible] = useState(true)
+
+  const handleClose = useCallback(() => {
+    setIsVisible(false)
+  }, [])
 
   if (!isVisible) return null
 
@@ -42,7 +46,7 @@ export function AdBanner({ position, format = "banner" }: AdBannerProps) {
     >
       <button
         className="absolute top-1 right-1 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 z-10"
-        onClick={() => setIsVisible(false)}
+        onClick={handleClose}
         aria-label="Close advertisement"
       >
         <X className="h-4 w-4" />
@@ -80,5 +84,5 @@ export function AdBanner({ position, format = "banner" }: AdBannerProps) {
       </div>
     </div>
   )
-}
+})
 
