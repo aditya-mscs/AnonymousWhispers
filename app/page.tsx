@@ -10,7 +10,7 @@ export default function HomePage() {
     <div className="container py-8 px-4">
       <div className="space-y-10">
         <div className="text-center">
-          <h1 className="text-3xl font-bold mb-4">Share Your Darkest Secrets Anonymously</h1>
+          <h1 className="text-3xl font-bold mb-4">Share Your Darkest Secrets Anonymously. Give it a try</h1>
           <p className="text-xl text-gray-500 dark:text-gray-400">
             A safe space to vent without judgment. No names, no traces, just release.
           </p>
